@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { format, parseISO } from 'date-fns'
 import toast from 'react-hot-toast'
-import { FaArrowLeft, FaArrowRight, FaBus, FaCheck, FaCheckCircle, FaCreditCard, FaMobileAlt, FaShieldAlt, FaUniversity, FaUser } from 'react-icons/fa'
+import { FaArrowLeft, FaArrowRight, FaBus, FaCheck, FaCheckCircle, FaCreditCard, FaDownload, FaMobileAlt, FaShieldAlt, FaUniversity, FaUser } from 'react-icons/fa'
 import { MdEventSeat, MdPayment } from 'react-icons/md'
 import { bookingApi, seatApi } from '../services/api'
 import { useAuth } from '../context/AuthContext'
@@ -144,6 +144,7 @@ export default function BookingPage() {
   const [passengers, setPassengers] = useState([])
   const [payMethod, setPayMethod] = useState('UPI')
   const [loading, setLoading] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [confirmed, setConfirmed] = useState(null)
 
   useEffect(() => {
@@ -229,6 +230,26 @@ export default function BookingPage() {
     }
   }
 
+  const handleDownloadTicket = async () => {
+    if (!confirmed?.ref) return
+
+    setDownloading(true)
+    try {
+      const response = await bookingApi.downloadTicket(confirmed.ref)
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `BookMyRoute-${confirmed.ref}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   if (step === 3 && confirmed) {
     return (
       <div className="page-shell flex items-center justify-center p-4">
@@ -260,8 +281,11 @@ export default function BookingPage() {
             ))}
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <button onClick={() => navigate('/my-bookings')} className="btn-primary">My bookings</button>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <button onClick={handleDownloadTicket} disabled={downloading} className="btn-primary">
+              <FaDownload /> {downloading ? 'Downloading...' : 'Ticket PDF'}
+            </button>
+            <button onClick={() => navigate('/my-bookings')} className="btn-outline">My bookings</button>
             <button onClick={() => navigate('/search')} className="btn-outline">Book another</button>
           </div>
         </div>
