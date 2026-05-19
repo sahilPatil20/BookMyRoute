@@ -10,9 +10,11 @@ import com.bookmyroute.dto.response.AdminScheduleResponse;
 import com.bookmyroute.dto.response.AdminUserResponse;
 import com.bookmyroute.dto.response.ApiResponse;
 import com.bookmyroute.dto.response.BookingResponse;
+import com.bookmyroute.dto.response.EmailDeliveryResponse;
 import com.bookmyroute.enums.BookingStatus;
 import com.bookmyroute.enums.Role;
 import com.bookmyroute.service.AdminService;
+import com.bookmyroute.service.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +28,11 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+    private final EmailService emailService;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, EmailService emailService) {
         this.adminService = adminService;
+        this.emailService = emailService;
     }
 
     @GetMapping("/dashboard")
@@ -104,8 +108,18 @@ public class AdminController {
 
     @PatchMapping("/bookings/{bookingRef}/cancel")
     public ResponseEntity<ApiResponse<BookingResponse>> cancelBooking(@PathVariable String bookingRef) {
-        return ResponseEntity.ok(ApiResponse.success(
-                adminService.cancelBooking(bookingRef),
-                "Booking cancelled and refund initiated"));
+        BookingResponse response = adminService.cancelBooking(bookingRef);
+        String message = Boolean.TRUE.equals(response.getNotificationEmailSent())
+                ? "Booking cancelled, refund initiated, and cancellation email sent"
+                : "Booking cancelled and refund initiated. Cancellation email was not sent: "
+                        + response.getNotificationEmailMessage();
+        return ResponseEntity.ok(ApiResponse.success(response, message));
+    }
+
+    @PostMapping("/email/test")
+    public ResponseEntity<ApiResponse<EmailDeliveryResponse>> sendTestEmail(@RequestParam String to) {
+        EmailDeliveryResponse delivery = emailService.sendTestEmail(to);
+        String message = delivery.isSent() ? "Test email sent" : delivery.getMessage();
+        return ResponseEntity.ok(ApiResponse.success(delivery, message));
     }
 }

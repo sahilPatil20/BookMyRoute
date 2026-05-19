@@ -188,10 +188,15 @@ All config lives in `backend/src/main/resources/application.properties`. Key set
 | `spring.datasource.username` | `root` | MySQL username |
 | `spring.datasource.password` | `root` | MySQL password |
 | `spring.datasource.url` | `jdbc:mysql://localhost:3306/bookmyroute` | DB connection URL |
-| `app.admin.email` | `admin@bookmyroute.com` | Default admin email |
+| `app.admin.email` | `book.my.route2026@gmail.com` | Default admin email |
 | `app.admin.password` | `Admin@12345` | Default admin password |
 | `openai.api.key` | *(empty)* | OpenAI key for chatbot feature |
 | `openai.model` | `gpt-5.4-mini` | OpenAI model to use |
+| `spring.mail.username` | *(empty)* | SMTP username, usually your Gmail address |
+| `spring.mail.password` | *(empty)* | SMTP password, use a Gmail App Password for Gmail |
+| `app.mail.enabled` | `true` | Enables or disables outgoing email notifications |
+| `app.mail.from` | `MAIL_USERNAME` | Sender email address |
+| `app.mail.sender-name` | `BookMyRoute` | Sender display name |
 | `app.jwt.expiration-ms` | `86400000` | JWT token expiry (24 hours) |
 | `app.cors.allowed-origins` | `http://localhost:3000,http://localhost:5173` | Allowed CORS origins |
 
@@ -201,13 +206,26 @@ You can also pass these as environment variables:
 DB_USERNAME=myuser DB_PASSWORD=mypass mvn spring-boot:run
 ```
 
+For Gmail email notifications, enable 2-Step Verification in your Google account, create an App Password, then start the backend with:
+
+```bash
+MAIL_USERNAME=yourgmail@gmail.com MAIL_PASSWORD=your-app-password MAIL_FROM=yourgmail@gmail.com mvn spring-boot:run
+```
+
+After admin login, you can verify SMTP without creating a booking:
+
+```bash
+curl -X POST "http://localhost:8080/api/admin/email/test?to=recipient@example.com" \
+  -H "Authorization: Bearer YOUR_ADMIN_JWT"
+```
+
 ---
 
 ## 🔐 Default Credentials
 
 | Role | Email | Password |
 |------|-------|---------|
-| Admin | `admin@bookmyroute.com` | `Admin@12345` |
+| Admin | `book.my.route2026@gmail.com` | `Admin@12345` |
 
 > The admin account is auto-created on first startup. Register new user accounts from the `/register` page.
 
