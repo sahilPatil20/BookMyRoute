@@ -35,8 +35,11 @@ public class BookingController {
             @Valid @RequestBody BookingRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         BookingResponse response = bookingService.createBooking(request, userDetails.getUsername());
+        String message = Boolean.TRUE.equals(response.getNotificationEmailSent())
+                ? "Booking confirmed and confirmation email sent"
+                : "Booking confirmed. Confirmation email was not sent: " + response.getNotificationEmailMessage();
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response, "Booking confirmed"));
+                .body(ApiResponse.success(response, message));
     }
 
     @GetMapping("/my")
@@ -74,9 +77,12 @@ public class BookingController {
     public ResponseEntity<ApiResponse<BookingResponse>> cancelBooking(
             @PathVariable String bookingRef,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.success(
-                bookingService.cancelBooking(bookingRef, userDetails.getUsername()),
-                "Booking cancelled and refund initiated"));
+        BookingResponse response = bookingService.cancelBooking(bookingRef, userDetails.getUsername());
+        String message = Boolean.TRUE.equals(response.getNotificationEmailSent())
+                ? "Booking cancelled, refund initiated, and cancellation email sent"
+                : "Booking cancelled and refund initiated. Cancellation email was not sent: "
+                        + response.getNotificationEmailMessage();
+        return ResponseEntity.ok(ApiResponse.success(response, message));
     }
 
     @GetMapping

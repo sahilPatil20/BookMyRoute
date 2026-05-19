@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class AdminBootstrapConfig {
 
-    @Value("${app.admin.email:admin@bookmyroute.com}")
+    @Value("${app.admin.email:book.my.route2026@gmail.com}")
     private String adminEmail;
 
     @Value("${app.admin.password:Admin@12345}")

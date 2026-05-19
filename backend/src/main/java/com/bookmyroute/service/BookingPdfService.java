@@ -42,6 +42,10 @@ public class BookingPdfService {
             throw new BusinessException("Access denied to this booking");
         }
 
+        return generateTicketPdf(booking);
+    }
+
+    public byte[] generateTicketPdf(Booking booking) {
         try (PDDocument document = new PDDocument();
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             PDPage page = new PDPage(PDRectangle.A4);

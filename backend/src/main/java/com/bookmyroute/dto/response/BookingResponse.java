@@ -25,6 +25,8 @@ public class BookingResponse {
     private PaymentMethod paymentMethod;
     private LocalDateTime bookedAt;
     private List<SeatDetail> seats;
+    private Boolean notificationEmailSent;
+    private String notificationEmailMessage;
 
     public BookingResponse() {}
 
@@ -46,6 +48,8 @@ public class BookingResponse {
         private PaymentMethod paymentMethod;
         private LocalDateTime bookedAt;
         private List<SeatDetail> seats;
+        private Boolean notificationEmailSent;
+        private String notificationEmailMessage;
 
         public Builder bookingId(Long bookingId) { this.bookingId = bookingId; return this; }
         public Builder bookingRef(String bookingRef) { this.bookingRef = bookingRef; return this; }
@@ -62,6 +66,8 @@ public class BookingResponse {
         public Builder paymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; return this; }
         public Builder bookedAt(LocalDateTime bookedAt) { this.bookedAt = bookedAt; return this; }
         public Builder seats(List<SeatDetail> seats) { this.seats = seats; return this; }
+        public Builder notificationEmailSent(Boolean notificationEmailSent) { this.notificationEmailSent = notificationEmailSent; return this; }
+        public Builder notificationEmailMessage(String notificationEmailMessage) { this.notificationEmailMessage = notificationEmailMessage; return this; }
 
         public BookingResponse build() {
             BookingResponse r = new BookingResponse();
@@ -72,6 +78,8 @@ public class BookingResponse {
             r.busName = this.busName; r.totalAmount = this.totalAmount;
             r.bookingStatus = this.bookingStatus; r.paymentStatus = this.paymentStatus;
             r.paymentMethod = this.paymentMethod; r.bookedAt = this.bookedAt; r.seats = this.seats;
+            r.notificationEmailSent = this.notificationEmailSent;
+            r.notificationEmailMessage = this.notificationEmailMessage;
             return r;
         }
     }
@@ -106,6 +114,10 @@ public class BookingResponse {
     public void setBookedAt(LocalDateTime bookedAt) { this.bookedAt = bookedAt; }
     public List<SeatDetail> getSeats() { return seats; }
     public void setSeats(List<SeatDetail> seats) { this.seats = seats; }
+    public Boolean getNotificationEmailSent() { return notificationEmailSent; }
+    public void setNotificationEmailSent(Boolean notificationEmailSent) { this.notificationEmailSent = notificationEmailSent; }
+    public String getNotificationEmailMessage() { return notificationEmailMessage; }
+    public void setNotificationEmailMessage(String notificationEmailMessage) { this.notificationEmailMessage = notificationEmailMessage; }
 
     public static class SeatDetail {
         private String seatNumber;

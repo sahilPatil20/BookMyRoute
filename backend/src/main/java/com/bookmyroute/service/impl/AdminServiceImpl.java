@@ -9,6 +9,7 @@ import com.bookmyroute.dto.response.AdminRouteResponse;
 import com.bookmyroute.dto.response.AdminScheduleResponse;
 import com.bookmyroute.dto.response.AdminUserResponse;
 import com.bookmyroute.dto.response.BookingResponse;
+import com.bookmyroute.dto.response.EmailDeliveryResponse;
 import com.bookmyroute.entity.Bus;
 import com.bookmyroute.entity.Booking;
 import com.bookmyroute.entity.Payment;
@@ -27,6 +28,7 @@ import com.bookmyroute.repository.RouteRepository;
 import com.bookmyroute.repository.ScheduleRepository;
 import com.bookmyroute.repository.UserRepository;
 import com.bookmyroute.service.AdminService;
+import com.bookmyroute.service.EmailService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,26 +38,28 @@ import java.util.List;
 
 @Service
 public class AdminServiceImpl implements AdminService {
-
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final PaymentRepository paymentRepository;
     private final BusRepository busRepository;
     private final RouteRepository routeRepository;
     private final ScheduleRepository scheduleRepository;
+    private final EmailService emailService;
 
     public AdminServiceImpl(UserRepository userRepository,
                             BookingRepository bookingRepository,
                             PaymentRepository paymentRepository,
                             BusRepository busRepository,
                             RouteRepository routeRepository,
-                            ScheduleRepository scheduleRepository) {
+                            ScheduleRepository scheduleRepository,
+                            EmailService emailService) {
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.paymentRepository = paymentRepository;
         this.busRepository = busRepository;
         this.routeRepository = routeRepository;
         this.scheduleRepository = scheduleRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -239,7 +243,10 @@ public class AdminServiceImpl implements AdminService {
             booking.getPayment().setStatus(PaymentStatus.REFUNDED);
         }
 
-        return toBookingResponse(bookingRepository.save(booking));
+        Booking saved = bookingRepository.save(booking);
+        EmailDeliveryResponse emailDelivery = emailService.sendBookingCancellation(saved);
+
+        return toBookingResponse(saved, emailDelivery);
     }
 
     private BigDecimal calculateRevenue() {
@@ -311,6 +318,10 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private BookingResponse toBookingResponse(Booking booking) {
+        return toBookingResponse(booking, null);
+    }
+
+    private BookingResponse toBookingResponse(Booking booking, EmailDeliveryResponse emailDelivery) {
         Payment payment = booking.getPayment();
         return BookingResponse.builder()
                 .bookingId(booking.getId())
@@ -336,6 +347,8 @@ public class AdminServiceImpl implements AdminService {
                                 .fare(seat.getFare())
                                 .build())
                         .toList())
+                .notificationEmailSent(emailDelivery != null ? emailDelivery.isSent() : null)
+                .notificationEmailMessage(emailDelivery != null ? emailDelivery.getMessage() : null)
                 .build();
     }
 }

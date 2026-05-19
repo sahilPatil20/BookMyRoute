@@ -14,9 +14,13 @@ backend/.project
 *.jar
 *.war
 
+# Local tooling
+tools/
+apache-maven-*-bin.zip
+
 # IDE
 .idea/
-.vscode/
+.vscode/launch.json
 *.iml
 
 # OS

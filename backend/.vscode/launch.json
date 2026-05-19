@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "BookMyRoute Backend",
+      "request": "launch",
+      "mainClass": "com.bookmyroute.BookMyRouteApplication",
+      "projectName": "backend",
+      "env": {
+        "MAIL_USERNAME": "book.my.route2026@gmail.com",
+        "MAIL_PASSWORD": "pcxw mmdu grgh behv",
+        "DB_USERNAME": "root",
+        "DB_PASSWORD": "root"
+      }
+    }
+  ]
+}

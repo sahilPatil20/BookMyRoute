@@ -222,9 +222,15 @@ export default function BookingPage() {
         ref: booking?.bookingRef || 'BMR-CONFIRMED',
         amount: booking?.totalAmount || totalFare,
         status: booking?.bookingStatus || 'CONFIRMED',
+        emailSent: booking?.notificationEmailSent === true,
+        emailMessage: booking?.notificationEmailMessage,
       })
       setStep(3)
-      toast.success('Booking confirmed')
+      if (booking?.notificationEmailSent === true) {
+        toast.success('Booking confirmed and email sent')
+      } else {
+        toast.success('Booking confirmed')
+      }
     } finally {
       setLoading(false)
     }
@@ -258,7 +264,11 @@ export default function BookingPage() {
             <FaCheckCircle className="text-4xl" />
           </div>
           <h1 className="text-3xl font-800 text-[#172033]">Booking confirmed</h1>
-          <p className="mt-2 text-sm text-slate-500">Your ticket has been sent to {user?.email || 'your email'}.</p>
+          <p className="mt-2 text-sm text-slate-500">
+            {confirmed.emailSent
+              ? `Your ticket has been sent to ${user?.email || 'your email'}.`
+              : confirmed.emailMessage || 'Email notification was not sent. You can still download your ticket PDF.'}
+          </p>
 
           <div className="my-6 rounded-lg bg-[#172033] p-4">
             <p className="font-mono text-xl font-800 tracking-wider text-[#f59e0b]">{confirmed.ref}</p>
